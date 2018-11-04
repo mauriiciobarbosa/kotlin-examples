@@ -1,40 +1,64 @@
 fun main(args: Array<String>) {
-    val sum :(Int, Int) -> Int = { x, y -> x + y }
+    val sum: (Int, Int) -> Int = {x, y -> x + y}
     val action = { println(42) }
-    println(sum(3, 4))
+    println(sum(4,5))
     action()
-   
+
     twoAndThree {
-        a, b -> a * b
+        a, b -> a + b
     }
-    
-    println("ab1c".filter {it in 'a'..'z'})
 
-    val calculator = getShippingCostCalculator(Delivery.EXPEDITED)
-    println("Shipping costs ${calculator(Order(3))}")
-}
+    println("mauricio".filter {
+        it in 'a'..'o'
+    })
 
-fun twoAndThree(operation: (Int, Int) -> Int) {
-    val result = operation(2, 3)
-    println("The result is $result")
+
+    val contacts = listOf(Person("Dmitry", "Jeremov", "123-4567"),
+                          Person("Svetlana", "Isakova", null))
+
+    val contactListFilters = ContactListFilters().apply {
+        prefix = "Dm"
+        onlyWithPhoneNumber = true
+    }
+
+    println(contacts.filter(contactListFilters.getPredicate()))
+
 }
 
 fun String.filter(predicate: (Char) -> Boolean): String {
     val sb = StringBuilder()
+
     this.forEach {
         if (predicate(it)) sb.append(it)
     }
+
     return sb.toString()
 }
 
-enum class Delivery { STANDARD, EXPEDITED }
+inline fun twoAndThree(operation: (Int, Int) -> Int) {
+    val result = operation(2, 3)
+    println("The result is $result")
+} 
 
-class Order(val itemCount: Int)
+data class Person(val firstName: String,
+                  val lastName: String,
+                  val phoneNumber: String?)
 
-fun getShippingCostCalculator(delivery: Delivery): (Order) -> Double {
-    return when(delivery) {
-        Delivery.EXPEDITED -> { order -> 6 + 2.1 * order.itemCount }
-        Delivery.STANDARD -> { order -> 1.2 * order.itemCount }
-        // else -> throw RuntimeException("invalid delivery $delivery")
+class ContactListFilters {
+    var prefix: String = ""
+    var onlyWithPhoneNumber: Boolean = false
+
+    fun getPredicate(): (Person) -> Boolean {
+        val startWithPrefix = {
+            p: Person -> 
+            p.firstName.startsWith(prefix) || p.lastName.startsWith(prefix)
+        }
+
+        if (onlyWithPhoneNumber) {
+            return { startWithPrefix(it) && it.phoneNumber != null }
+        }
+
+        return startWithPrefix
     }
+
 }
