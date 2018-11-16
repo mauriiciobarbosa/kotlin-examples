@@ -8,19 +8,18 @@ fun main() {
     val myTable = table {
         for ((index, cell) in cells.withIndex()) {
             val (month, saving) = cell
-            if (index == 0) {
-                tr {
+            val color = if (saving.startsWith('-')) "red" else "blue"
+
+            tr {
+                if (index == 0) {
                     th(month)
                     th(saving)
-                }
-            } else {
-                val color = if (saving.startsWith('-')) "red" else "blue"
-                tr {
+                } else {
                     td { content(month) }
                     td {
                         content(saving)
                         bgColor(color)
-                    }
+                    }  
                 }
             }
         }
